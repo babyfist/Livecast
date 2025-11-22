@@ -12,7 +12,8 @@ import {
   Loader,
   Bot,
   Square,
-  Circle
+  Circle,
+  Focus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -120,6 +121,9 @@ export function Controls({
           <ToggleGroup type="single" value={layout} onValueChange={(value: LayoutMode) => value && setLayout(value)} aria-label="Layout mode">
             <ToggleGroupItem value="grid" aria-label="Grid layout">
               <Square className="h-5 w-5" />
+            </ToggleGroupItem>
+             <ToggleGroupItem value="focus" aria-label="Focus layout">
+              <Focus className="h-5 w-5" />
             </ToggleGroupItem>
             <ToggleGroupItem value="circle" aria-label="Circle layout">
               <Circle className="h-5 w-5" />

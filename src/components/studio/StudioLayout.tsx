@@ -72,7 +72,7 @@ export function StudioLayout() {
                 name: 'Alex',
                 isHost: false,
                 isMuted: true,
-                isCameraOn: false,
+                isCameraOn: true,
                 isScreenSharing: false,
                 image: PlaceHolderImages.find(p => p.id === 'guest1')!,
                 stream: undefined
@@ -120,15 +120,25 @@ export function StudioLayout() {
   
 
   const onStageParticipants = useMemo(
-    () => participants.filter((p) => (p.isCameraOn && p.stream) || p.isScreenSharing || (!p.stream && p.isCameraOn)),
+    () => participants.filter((p) => (p.isCameraOn && p.isHost) || (p.isCameraOn && !p.isHost) || p.isScreenSharing),
     [participants]
   );
   
   useEffect(() => {
-    if (focusedParticipantId && !onStageParticipants.find(p => p.id === focusedParticipantId)) {
+    // If a manually focused participant leaves the stage, unfocus them
+    if (focusedParticipantId && layout !== 'focus' && !onStageParticipants.find(p => p.id === focusedParticipantId)) {
       setFocusedParticipantId(null);
     }
-  }, [onStageParticipants, focusedParticipantId]);
+  }, [onStageParticipants, focusedParticipantId, layout]);
+
+  useEffect(() => {
+    // When switching to a grid/circle layout, clear any manual focus.
+    // When switching to focus layout, also clear manual focus to let auto-focus take over.
+    if (layout === 'grid' || layout === 'circle' || layout === 'focus') {
+      setFocusedParticipantId(null);
+    }
+  }, [layout]);
+
 
   const toggleMute = (participantId: string) => {
     const participant = participants.find(p => p.id === participantId);
@@ -172,7 +182,7 @@ export function StudioLayout() {
           name: 'Screen Share',
           isHost: false,
           isMuted: true,
-          isCameraOn: false,
+          isCameraOn: true, // Treat as on to get it on stage
           isScreenSharing: true,
           image: PlaceHolderImages.find(p => p.id === 'screenshare')!,
           stream: screenStream,
@@ -185,7 +195,7 @@ export function StudioLayout() {
           }
         };
         setParticipants(prev => [...prev, newScreenShare]);
-        setFocusedParticipantId('screenshare');
+        setLayout('focus');
       } catch (error) {
         console.error("Error starting screen share:", error);
         toast({
@@ -198,7 +208,9 @@ export function StudioLayout() {
   };
 
   const setFocus = (participantId: string | null) => {
-    setFocusedParticipantId(participantId);
+    if (layout !== 'focus') {
+        setFocusedParticipantId(participantId);
+    }
   };
 
   const handleGoLive = () => {

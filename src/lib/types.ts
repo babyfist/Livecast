@@ -11,7 +11,7 @@ export type Participant = {
   stream?: MediaStream;
 };
 
-export type LayoutMode = 'grid' | 'circle';
+export type LayoutMode = 'grid' | 'circle' | 'focus';
 
 export type RtmpDestination = {
     id: string;
