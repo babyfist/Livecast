@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, {useState} from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '../ui/input';
@@ -131,13 +131,14 @@ const ChatTabContent = ({ messages, platform }: { messages: ChatMessageType[], p
 
 
 export function ChatPanel() {
+  const [activeTab, setActiveTab] = useState<ChatPlatform | 'all'>('all');
 
   return (
-    <div className="flex-1 flex flex-col min-h-0">
+    <div className="flex flex-col flex-1 min-h-0">
       <div className="p-4 border-b border-border/50 shrink-0">
           <h2 className="font-semibold">Live Chat</h2>
       </div>
-      <Tabs defaultValue="all" className="flex-1 flex flex-col min-h-0">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="flex-1 flex flex-col min-h-0">
         <TabsList className="px-4 border-b border-border/50 justify-start rounded-none bg-transparent shrink-0">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="youtube"><PlatformIcon platform="youtube" /></TabsTrigger>
@@ -146,21 +147,10 @@ export function ChatPanel() {
             <TabsTrigger value="x"><PlatformIcon platform="x" /></TabsTrigger>
         </TabsList>
         
-        <TabsContent value="all" className="flex-1 flex flex-col min-h-0 mt-0">
-            <ChatTabContent messages={simulatedMessages} platform="all" />
+        <TabsContent value={activeTab} className="flex-1 flex flex-col min-h-0 mt-0">
+            <ChatTabContent messages={simulatedMessages} platform={activeTab} />
         </TabsContent>
-        <TabsContent value="youtube" className="flex-1 flex flex-col min-h-0 mt-0">
-            <ChatTabContent messages={simulatedMessages} platform="youtube" />
-        </TabsContent>
-        <TabsContent value="twitch" className="flex-1 flex flex-col min-h-0 mt-0">
-            <ChatTabContent messages={simulatedMessages} platform="twitch" />
-        </TabsContent>
-        <TabsContent value="kick" className="flex-1 flex flex-col min-h-0 mt-0">
-            <ChatTabContent messages={simulatedMessages} platform="kick" />
-        </TabsContent>
-        <TabsContent value="x" className="flex-1 flex flex-col min-h-0 mt-0">
-            <ChatTabContent messages={simulatedMessages} platform="x" />
-        </TabsContent>
+
       </Tabs>
       <Separator />
       <div className="p-4 shrink-0">
