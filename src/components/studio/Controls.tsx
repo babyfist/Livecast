@@ -10,7 +10,9 @@ import {
   UserPlus,
   Podcast,
   Loader,
-  Bot
+  Bot,
+  Square,
+  Circle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,8 +24,10 @@ import {
 } from '@/components/ui/select';
 import { generateSceneBanner } from '@/ai/flows/auto-scene-banner';
 import { useToast } from '@/hooks/use-toast';
-import type { Participant } from '@/lib/types';
+import type { Participant, LayoutMode } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+
 
 interface ControlsProps {
   host: Participant;
@@ -34,6 +38,8 @@ interface ControlsProps {
   handleGoLive: () => void;
   setBannerText: (text: string) => void;
   isScreenSharing: boolean;
+  layout: LayoutMode;
+  setLayout: (layout: LayoutMode) => void;
 }
 
 const sceneOptions = [
@@ -52,7 +58,9 @@ export function Controls({
   isLive,
   handleGoLive,
   setBannerText,
-  isScreenSharing
+  isScreenSharing,
+  layout,
+  setLayout
 }: ControlsProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -109,6 +117,14 @@ export function Controls({
            <Button variant={isScreenSharing ? "secondary" : "outline"} size="lg" onClick={toggleScreenShare} aria-label={isScreenSharing ? 'Stop sharing' : 'Share screen'}>
             <MonitorUp className="size-5" />
           </Button>
+          <ToggleGroup type="single" value={layout} onValueChange={(value: LayoutMode) => value && setLayout(value)} aria-label="Layout mode">
+            <ToggleGroupItem value="grid" aria-label="Grid layout">
+              <Square className="h-5 w-5" />
+            </ToggleGroupItem>
+            <ToggleGroupItem value="circle" aria-label="Circle layout">
+              <Circle className="h-5 w-5" />
+            </ToggleGroupItem>
+          </ToggleGroup>
         </div>
 
         <div className="flex justify-center items-center gap-2">

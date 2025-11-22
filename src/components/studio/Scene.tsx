@@ -1,6 +1,6 @@
 'use client';
 
-import type { Participant } from '@/lib/types';
+import type { Participant, LayoutMode } from '@/lib/types';
 import { ParticipantCard } from './ParticipantCard';
 import { AIBanner } from './AIBanner';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,7 @@ interface SceneProps {
   focusedParticipantId: string | null;
   setFocus: (id: string | null) => void;
   bannerText: string;
+  layout: LayoutMode;
 }
 
 export function Scene({
@@ -17,6 +18,7 @@ export function Scene({
   focusedParticipantId,
   setFocus,
   bannerText,
+  layout
 }: SceneProps) {
   const focusedParticipant = participants.find((p) => p.id === focusedParticipantId);
   const otherParticipants = participants.filter((p) => p.id !== focusedParticipantId);
@@ -25,7 +27,7 @@ export function Scene({
     <div className="flex-1 relative bg-black/80 p-4 flex flex-col gap-4 overflow-hidden">
       {participants.length === 0 && (
          <div className="flex-1 flex items-center justify-center">
-            <p className="text-muted-foreground text-lg">Turn on camera to join the stage</p>
+            <p className="text-muted-foreground text-lg">Turn on your camera to join the stage</p>
          </div>
       )}
       {focusedParticipant ? (
@@ -35,16 +37,21 @@ export function Scene({
               participant={focusedParticipant}
               isFocused
               onFocus={() => setFocus(null)}
+              layout={layout}
             />
           </div>
           {otherParticipants.length > 0 && (
              <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto md:w-48 lg:w-64">
              {otherParticipants.map((p) => (
-               <div key={p.id} className="md:h-1/4 w-40 md:w-full flex-shrink-0">
+               <div key={p.id} className={cn(
+                 "md:h-1/4 w-40 md:w-full flex-shrink-0",
+                 layout === 'circle' && "aspect-square"
+               )}>
                  <ParticipantCard
                    participant={p}
                    isFocused={false}
                    onFocus={() => setFocus(p.id)}
+                   layout={layout}
                  />
                </div>
              ))}
@@ -54,7 +61,9 @@ export function Scene({
       ) : (
         <div
           className={cn(
-            'grid flex-1 gap-4 transition-all duration-300',
+            'flex-1 transition-all duration-300',
+            layout === 'grid' && 'grid gap-4',
+            layout === 'circle' && 'flex flex-wrap items-center justify-center gap-6',
             participants.length === 1 && 'grid-cols-1 grid-rows-1',
             participants.length === 2 && 'grid-cols-2 grid-rows-1',
             participants.length >= 3 && participants.length <= 4 && 'grid-cols-2 grid-rows-2',
@@ -62,12 +71,14 @@ export function Scene({
           )}
         >
           {participants.map((p) => (
-            <ParticipantCard
-              key={p.id}
-              participant={p}
-              isFocused={false}
-              onFocus={() => setFocus(p.id)}
-            />
+             <div key={p.id} className={cn(layout === 'circle' && "w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56")}>
+              <ParticipantCard
+                participant={p}
+                isFocused={false}
+                onFocus={() => setFocus(p.id)}
+                layout={layout}
+              />
+            </div>
           ))}
         </div>
       )}

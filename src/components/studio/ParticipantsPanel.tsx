@@ -10,13 +10,16 @@ import {
   Focus,
   User,
   Plus,
+  Check,
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '../ui/badge';
 
 interface ParticipantsPanelProps {
   participants: Participant[];
+  onStageParticipants: Participant[];
   setParticipants: React.Dispatch<React.SetStateAction<Participant[]>>;
   toggleMute: (id: string) => void;
   toggleCamera: (id: string) => void;
@@ -25,6 +28,7 @@ interface ParticipantsPanelProps {
 
 export function ParticipantsPanel({
   participants,
+  onStageParticipants,
   setParticipants,
   toggleMute,
   toggleCamera,
@@ -34,22 +38,9 @@ export function ParticipantsPanel({
   const host = participants.find(p => p.isHost);
 
   const addGuest = () => {
-    const guestId = `guest${participants.filter(p => !p.isHost).length + 3}`;
-    const newGuest: Participant = {
-        id: guestId,
-        name: `Guest ${participants.length}`,
-        isHost: false,
-        isMuted: true,
-        isCameraOn: false,
-        isScreenSharing: false,
-        image: {
-            id: guestId,
-            description: `Guest ${participants.length}`,
-            imageUrl: `https://picsum.photos/seed/${guestId}/1280/720`,
-            imageHint: "person portrait"
-        }
-    };
-    setParticipants(prev => [...prev, newGuest]);
+    // This is a placeholder for a real invite flow.
+    // In a real app, this would generate an invite link.
+    console.log("Invite guest clicked");
   }
 
   return (
@@ -59,18 +50,20 @@ export function ParticipantsPanel({
       </div>
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-4">
-          {participants.map((p) => (
+          {participants.map((p) => {
+            const isOnStage = onStageParticipants.some(onstage => onstage.id === p.id);
+            return (
             <div key={p.id} className="flex items-center gap-3">
               <Avatar>
-                <AvatarImage src={p.image.imageUrl} alt={p.name} />
+                <AvatarImage src={p.isScreenSharing ? undefined : p.image.imageUrl} alt={p.name} />
                 <AvatarFallback>
                   <User className="size-5" />
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="text-sm font-medium">{p.name}</p>
+                <p className="text-sm font-medium flex items-center gap-2">{p.name} {isOnStage && <Badge variant="secondary" className="gap-1"><Check className="size-3 text-green-500"/> On Stage</Badge>}</p>
               </div>
-              {host?.id !== p.id && (
+              {host?.id !== p.id && !p.isScreenSharing &&(
                 <>
                   <Button
                     variant="ghost"
@@ -106,11 +99,12 @@ export function ParticipantsPanel({
                 className="size-8"
                 onClick={() => setFocus(p.id)}
                 aria-label="Focus"
+                disabled={!isOnStage}
               >
                 <Focus className="size-4" />
               </Button>
             </div>
-          ))}
+          )})}
         </div>
       </ScrollArea>
       <Separator />

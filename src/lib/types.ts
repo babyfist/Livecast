@@ -8,4 +8,7 @@ export type Participant = {
   isCameraOn: boolean;
   isScreenSharing: boolean;
   image: ImagePlaceholder;
+  stream?: MediaStream;
 };
+
+export type LayoutMode = 'grid' | 'circle';

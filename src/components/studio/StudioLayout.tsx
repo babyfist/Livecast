@@ -1,56 +1,70 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
-import type { Participant } from '@/lib/types';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import type { Participant, LayoutMode } from '@/lib/types';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Header } from './Header';
 import { Scene } from './Scene';
 import { Controls } from './Controls';
 import { ParticipantsPanel } from './ParticipantsPanel';
-
-const initialParticipants: Participant[] = [
-  {
-    id: 'host',
-    name: 'Alex (Host)',
-    isHost: true,
-    isMuted: false,
-    isCameraOn: true,
-    isScreenSharing: false,
-    image: PlaceHolderImages.find((p) => p.id === 'host')!,
-  },
-  {
-    id: 'guest1',
-    name: 'Maria',
-    isHost: false,
-    isMuted: true,
-    isCameraOn: true,
-    isScreenSharing: false,
-    image: PlaceHolderImages.find((p) => p.id === 'guest1')!,
-  },
-  {
-    id: 'guest2',
-    name: 'David',
-    isHost: false,
-    isMuted: false,
-    isCameraOn: false,
-    isScreenSharing: false,
-    image: PlaceHolderImages.find((p) => p.id === 'guest2')!,
-  },
-];
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Video } from 'lucide-react';
 
 export function StudioLayout() {
-  const [participants, setParticipants] = useState<Participant[]>(initialParticipants);
+  const [participants, setParticipants] = useState<Participant[]>([]);
   const [focusedParticipantId, setFocusedParticipantId] = useState<string | null>(null);
   const [isLive, setIsLive] = useState(false);
   const [bannerText, setBannerText] = useState<string>('');
-  const [host, setHost] = useState(participants.find(p => p.isHost)!);
+  const [layout, setLayout] = useState<LayoutMode>('grid');
 
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const { toast } = useToast();
+
+  const host: Participant | undefined = useMemo(() => participants.find(p => p.isHost), [participants]);
+
+  // Request camera and mic permissions
   useEffect(() => {
-    setHost(participants.find(p => p.isHost)!)
-  }, [participants]);
+    const getMedia = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        setLocalStream(stream);
+        setHasCameraPermission(true);
+        const hostParticipant: Participant = {
+          id: 'host',
+          name: 'You (Host)',
+          isHost: true,
+          isMuted: false,
+          isCameraOn: true,
+          isScreenSharing: false,
+          image: PlaceHolderImages.find((p) => p.id === 'host')!,
+          stream: stream,
+        };
+        setParticipants([hostParticipant]);
+      } catch (err) {
+        console.error('Error accessing media devices.', err);
+        setHasCameraPermission(false);
+        toast({
+          variant: "destructive",
+          title: "Camera/Mic Access Denied",
+          description: "Please enable camera and microphone permissions in your browser to use this app.",
+        });
+      }
+    };
+    getMedia();
+
+    return () => {
+        localStream?.getTracks().forEach(track => track.stop());
+    }
+  }, [toast]);
+  
 
   const onStageParticipants = useMemo(
-    () => participants.filter((p) => p.isCameraOn || p.isScreenSharing),
+    () => participants.filter((p) => (p.isCameraOn && p.stream) || p.isScreenSharing),
     [participants]
   );
   
@@ -61,35 +75,69 @@ export function StudioLayout() {
   }, [onStageParticipants, focusedParticipantId]);
 
   const toggleMute = (participantId: string) => {
-    setParticipants((prev) =>
-      prev.map((p) => (p.id === participantId ? { ...p, isMuted: !p.isMuted } : p))
-    );
+    const participant = participants.find(p => p.id === participantId);
+    if (participant?.stream) {
+      participant.stream.getAudioTracks().forEach(track => {
+        track.enabled = !track.enabled;
+      });
+      setParticipants((prev) =>
+        prev.map((p) => (p.id === participantId ? { ...p, isMuted: !p.isMuted } : p))
+      );
+    }
   };
 
   const toggleCamera = (participantId: string) => {
-    setParticipants((prev) =>
-      prev.map((p) => (p.id === participantId ? { ...p, isCameraOn: !p.isCameraOn } : p))
-    );
+    const participant = participants.find(p => p.id === participantId);
+    if(participant?.stream) {
+      participant.stream.getVideoTracks().forEach(track => {
+          track.enabled = !track.enabled;
+      });
+      setParticipants((prev) =>
+        prev.map((p) => (p.id === participantId ? { ...p, isCameraOn: !p.isCameraOn } : p))
+      );
+    }
   };
   
-  const toggleScreenShare = () => {
+  const toggleScreenShare = async () => {
     const screenShareParticipant = participants.find(p => p.isScreenSharing);
     if(screenShareParticipant) {
+       // Stop screen sharing
+      screenShareParticipant.stream?.getTracks().forEach(track => track.stop());
       setParticipants(prev => prev.filter(p => !p.isScreenSharing));
       if (focusedParticipantId === 'screenshare') {
         setFocusedParticipantId(null);
       }
     } else {
-      const newScreenShare: Participant = {
-        id: 'screenshare',
-        name: 'Screen Share',
-        isHost: false,
-        isMuted: true,
-        isCameraOn: false,
-        isScreenSharing: true,
-        image: PlaceHolderImages.find(p => p.id === 'screenshare')!
-      };
-      setParticipants(prev => [...prev, newScreenShare]);
+       // Start screen sharing
+      try {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        const newScreenShare: Participant = {
+          id: 'screenshare',
+          name: 'Screen Share',
+          isHost: false,
+          isMuted: true,
+          isCameraOn: false,
+          isScreenSharing: true,
+          image: PlaceHolderImages.find(p => p.id === 'screenshare')!,
+          stream: screenStream,
+        };
+        // Handle stopping screen share via browser UI
+        screenStream.getVideoTracks()[0].onended = () => {
+          setParticipants(prev => prev.filter(p => !p.isScreenSharing));
+          if (focusedParticipantId === 'screenshare') {
+            setFocusedParticipantId(null);
+          }
+        };
+        setParticipants(prev => [...prev, newScreenShare]);
+        setFocusedParticipantId('screenshare');
+      } catch (error) {
+        console.error("Error starting screen share:", error);
+        toast({
+          variant: "destructive",
+          title: "Screen Share Failed",
+          description: "Could not start screen sharing. Please try again.",
+        });
+      }
     }
   };
 
@@ -101,6 +149,28 @@ export function StudioLayout() {
     setIsLive(!isLive);
   };
 
+  if (hasCameraPermission === false) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-background p-8">
+          <Alert variant="destructive" className="max-w-lg">
+            <Video className="size-4"/>
+            <AlertTitle>Camera and Microphone Access Required</AlertTitle>
+            <AlertDescription>
+              LiveCast Studio needs access to your camera and microphone. Please enable permissions in your browser's settings and refresh the page.
+            </AlertDescription>
+          </Alert>
+      </div>
+    );
+  }
+
+  if (hasCameraPermission === null || !host) {
+    return (
+       <div className="flex h-screen w-full items-center justify-center bg-background">
+          <p className="text-muted-foreground">Loading camera...</p>
+       </div>
+    )
+  }
+
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-background text-foreground font-sans">
       <main className="flex-1 flex flex-col">
@@ -110,6 +180,7 @@ export function StudioLayout() {
           focusedParticipantId={focusedParticipantId}
           setFocus={setFocus}
           bannerText={bannerText}
+          layout={layout}
         />
         <Controls
           host={host}
@@ -120,10 +191,13 @@ export function StudioLayout() {
           handleGoLive={handleGoLive}
           setBannerText={setBannerText}
           isScreenSharing={!!participants.find(p => p.isScreenSharing)}
+          layout={layout}
+          setLayout={setLayout}
         />
       </main>
       <ParticipantsPanel
         participants={participants}
+        onStageParticipants={onStageParticipants}
         setParticipants={setParticipants}
         toggleMute={toggleMute}
         toggleCamera={toggleCamera}
