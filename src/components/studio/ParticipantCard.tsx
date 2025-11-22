@@ -103,13 +103,16 @@ export function ParticipantCard({
         )}
       </div>
 
-      <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className={cn(
+        "absolute bottom-2 left-2 right-2 flex items-center justify-between",
+        isCircle && "bottom-4"
+      )}>
+        <div className={cn("flex items-center gap-2", isCircle && "w-full justify-center")}>
            {participant.isScreenSharing && <Monitor className="size-4 text-accent" />}
-           {!participant.isScreenSharing && <User className="size-4 text-white/80" />}
-          <p className="text-sm font-medium text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md">
+           {!participant.isScreenSharing && !isCircle && <User className="size-4 text-white/80" />}
+          <div className="text-sm font-medium text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md max-w-full truncate">
             {participant.name}
-          </p>
+          </div>
         </div>
       </div>
       
