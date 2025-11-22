@@ -40,7 +40,7 @@ const formSchema = z.object({
 type DestinationFormValues = z.infer<typeof formSchema>;
 
 interface SettingsDialogProps {
-    savedDestinations: Rtmpdestination[];
+    savedDestinations: RtmpDestination[];
     onDestinationsChange: (destinations: RtmpDestination[]) => void;
 }
 
@@ -82,7 +82,14 @@ export function SettingsDialog({ savedDestinations, onDestinationsChange }: Sett
   };
   
   const handleAddNew = () => {
-    append({ id: crypto.randomUUID(), name: '', url: '', key: '', platform: 'youtube', channelId: '' });
+    append({ 
+        id: crypto.randomUUID(), 
+        name: '', 
+        url: '', 
+        key: '', 
+        platform: 'youtube', 
+        channelId: '' 
+    });
   };
 
 
