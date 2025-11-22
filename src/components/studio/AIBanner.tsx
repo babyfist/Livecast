@@ -1,16 +1,13 @@
 'use client';
 
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { Bot } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
 interface AIBannerProps {
   text: string;
 }
-
-// Framer Motion is not available, using CSS transitions
-import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
 
 export function AIBanner({ text }: AIBannerProps) {
   const [visible, setVisible] = useState(false);

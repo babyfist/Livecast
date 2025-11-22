@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -21,6 +20,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '../ui/separator';
+import type { RtmpDestination } from '@/lib/types';
 
 const destinationSchema = z.object({
   id: z.string(),
@@ -34,7 +34,6 @@ const formSchema = z.object({
 });
 
 type DestinationFormValues = z.infer<typeof formSchema>;
-export type RtmpDestination = z.infer<typeof destinationSchema>;
 
 interface SettingsDialogProps {
     savedDestinations: RtmpDestination[];
@@ -70,13 +69,11 @@ export function SettingsDialog({ savedDestinations, onDestinationsChange }: Sett
   });
 
   const onSubmit = (data: DestinationFormValues) => {
-    // Save to local storage
     try {
         window.localStorage.setItem('rtmp-destinations', JSON.stringify(data.destinations));
     } catch (error) {
         console.warn('Error setting localStorage "rtmp-destinations":', error);
     }
-    // Propagate change to parent
     onDestinationsChange(data.destinations);
 
     toast({
@@ -138,7 +135,7 @@ export function SettingsDialog({ savedDestinations, onDestinationsChange }: Sett
                     <p className="text-sm text-destructive">{errors.destinations[index]?.url?.message}</p>
                   )}
                 </div>
-                <div className="space-y-1">
+                <_c_ class="space-y-1">
                   <Label htmlFor={`destinations.${index}.key`}>Stream Key</Label>
                   <Input
                     id={`destinations.${index}.key`}
@@ -149,7 +146,7 @@ export function SettingsDialog({ savedDestinations, onDestinationsChange }: Sett
                   {errors.destinations?.[index]?.key && (
                     <p className="text-sm text-destructive">{errors.destinations[index]?.key?.message}</p>
                   )}
-                </div>
+                </_c_>
                 <Button
                   type="button"
                   variant="ghost"

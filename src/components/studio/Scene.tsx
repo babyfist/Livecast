@@ -50,25 +50,26 @@ export function Scene({
          </div>
       )}
       
-      <div className={cn("flex-1 flex gap-4 h-full", sidebarParticipants.length > 0 ? "flex-col md:flex-row" : "flex-col")}>
+      <div className={cn("flex-1 flex gap-4 h-full min-h-0", sidebarParticipants.length > 0 ? "flex-col md:flex-row" : "flex-col")}>
         <div
             className={cn(
-                'flex-1 transition-all duration-300',
-                !isFocusView && layout === 'grid' && 'grid gap-4',
+                'flex-1 transition-all duration-300 min-h-0 min-w-0',
+                !isFocusView && layout === 'grid' && 'grid gap-4 place-content-center',
                 !isFocusView && layout === 'circle' && 'flex flex-wrap items-center justify-center gap-6',
                 !isFocusView && mainParticipants.length === 1 && 'grid-cols-1 grid-rows-1',
                 !isFocusView && mainParticipants.length === 2 && 'grid-cols-2 grid-rows-1',
                 !isFocusView && mainParticipants.length >= 3 && mainParticipants.length <= 4 && 'grid-cols-2 grid-rows-2',
-                !isFocusView && mainParticipants.length > 4 && 'grid-cols-3 grid-rows-2',
+                !isFocusView && mainParticipants.length > 4 && mainParticipants.length <= 6 && 'grid-cols-3 grid-rows-2',
+                !isFocusView && mainParticipants.length > 6 && 'grid-cols-4 grid-rows-3'
             )}
             >
             {mainParticipants.map((p) => (
                 <div 
                     key={p.id}
                     className={cn(
-                        "flex flex-col items-center justify-center gap-2",
+                        "flex items-center justify-center min-h-0",
                         !isFocusView && "cursor-pointer",
-                        !isFocusView && layout === 'circle' && "w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56"
+                        !isFocusView && layout === 'circle' && "w-40 h-auto aspect-square md:w-48 lg:w-56"
                     )}
                     onClick={() => !isFocusView && setFocus(p.id)}
                 >
@@ -89,7 +90,7 @@ export function Scene({
                     key={p.id}
                     className={cn(
                         "flex-shrink-0 cursor-pointer w-40 md:w-full",
-                        layout === 'circle' && 'h-40 md:h-auto md:aspect-square'
+                        layout === 'circle' ? 'h-auto aspect-square' : 'aspect-video'
                     )}
                     onClick={() => setFocus(p.id)}
                     >

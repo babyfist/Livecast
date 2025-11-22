@@ -72,7 +72,7 @@ export function StudioLayout() {
         const guestParticipants: Participant[] = [
             {
                 id: 'guest1',
-                name: 'Alex',
+                name: 'Alex Johnson',
                 isHost: false,
                 isMuted: true,
                 isCameraOn: true,
@@ -82,7 +82,7 @@ export function StudioLayout() {
             },
             {
                 id: 'guest2',
-                name: 'Samira',
+                name: 'Samira Chen',
                 isHost: false,
                 isMuted: true,
                 isCameraOn: false,
@@ -92,7 +92,7 @@ export function StudioLayout() {
             },
             {
                 id: 'guest3',
-                name: 'Kenji',
+                name: 'Kenji Tanaka',
                 isHost: false,
                 isMuted: false,
                 isCameraOn: false,
@@ -123,7 +123,7 @@ export function StudioLayout() {
   
 
   const onStageParticipants = useMemo(
-    () => participants.filter((p) => (p.isCameraOn && p.isHost) || (p.isCameraOn && !p.isHost) || p.isScreenSharing),
+    () => participants.filter((p) => (p.isCameraOn) || p.isScreenSharing),
     [participants]
   );
   
@@ -179,7 +179,7 @@ export function StudioLayout() {
     } else {
        // Start screen sharing
       try {
-        const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
         const newScreenShare: Participant = {
           id: 'screenshare',
           name: 'Screen Share',
@@ -269,7 +269,7 @@ export function StudioLayout() {
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-background text-foreground font-sans">
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col min-h-0">
         <Header>
             <SettingsDialog 
                 savedDestinations={rtmpDestinations}
@@ -297,8 +297,8 @@ export function StudioLayout() {
         />
       </main>
 
-      <aside className="w-full lg:w-80 bg-card/50 border-l border-border/50 flex flex-col">
-        <Tabs defaultValue="participants" className="flex flex-col flex-1">
+      <aside className="w-full lg:w-80 bg-card/50 border-l border-border/50 flex flex-col max-h-screen lg:max-h-none">
+        <Tabs defaultValue="participants" className="flex flex-col flex-1 min-h-0">
             <TabsList className="grid w-full grid-cols-2 rounded-none">
                 <TabsTrigger value="participants">
                     <Users className="mr-2 size-4" />
@@ -309,7 +309,7 @@ export function StudioLayout() {
                     Chat
                 </TabsTrigger>
             </TabsList>
-            <TabsContent value="participants" className="flex-1 flex flex-col mt-0">
+            <TabsContent value="participants" className="flex-1 flex flex-col mt-0 min-h-0">
                 <ParticipantsPanel
                     participants={participants}
                     onStageParticipants={onStageParticipants}
@@ -319,7 +319,7 @@ export function StudioLayout() {
                     setFocus={setFocus}
                 />
             </TabsContent>
-            <TabsContent value="chat" className="flex-1 flex flex-col mt-0">
+            <TabsContent value="chat" className="flex-1 flex flex-col mt-0 min-h-0">
                 <ChatPanel />
             </TabsContent>
         </Tabs>

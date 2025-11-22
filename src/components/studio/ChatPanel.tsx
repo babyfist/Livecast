@@ -126,19 +126,19 @@ export function ChatPanel() {
             <TabsTrigger value="x"><PlatformIcon platform="x" /></TabsTrigger>
         </TabsList>
         
-        <TabsContent value="all" className="flex-1 mt-0">
+        <TabsContent value="all" className="flex-1 flex flex-col min-h-0 mt-0">
             <ChatTabContent messages={simulatedMessages} platform="all" />
         </TabsContent>
-        <TabsContent value="youtube" className="flex-1 mt-0">
+        <TabsContent value="youtube" className="flex-1 flex flex-col min-h-0 mt-0">
             <ChatTabContent messages={simulatedMessages} platform="youtube" />
         </TabsContent>
-        <TabsContent value="twitch" className="flex-1 mt-0">
+        <TabsContent value="twitch" className="flex-1 flex flex-col min-h-0 mt-0">
             <ChatTabContent messages={simulatedMessages} platform="twitch" />
         </TabsContent>
-        <TabsContent value="kick" className="flex-1 mt-0">
+        <TabsContent value="kick" className="flex-1 flex flex-col min-h-0 mt-0">
             <ChatTabContent messages={simulatedMessages} platform="kick" />
         </TabsContent>
-        <TabsContent value="x" className="flex-1 mt-0">
+        <TabsContent value="x" className="flex-1 flex flex-col min-h-0 mt-0">
             <ChatTabContent messages={simulatedMessages} platform="x" />
         </TabsContent>
       </Tabs>

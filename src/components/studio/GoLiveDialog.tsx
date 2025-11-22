@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { RtmpDestination } from '@/lib/types';
+import type { RtmpDestination } from '@/lib/types';
 import { Server, Podcast } from 'lucide-react';
 import { ScrollArea } from '../ui/scroll-area';
 
@@ -41,7 +41,7 @@ export function GoLiveDialog({
     onStartStreaming(selectedDestinations);
   };
   
-  const allSelected = selectedDestinations.length === destinations.length;
+  const allSelected = destinations.length > 0 && selectedDestinations.length === destinations.length;
   const toggleSelectAll = () => {
       if(allSelected) {
           setSelectedDestinations([]);
@@ -61,7 +61,7 @@ export function GoLiveDialog({
         </DialogHeader>
         <div className="space-y-4">
             <div className="flex items-center space-x-2">
-                <Checkbox id="select-all" checked={allSelected} onCheckedChange={toggleSelectAll} />
+                <Checkbox id="select-all" checked={allSelected} onCheckedChange={toggleSelectAll} disabled={destinations.length === 0} />
                 <Label htmlFor="select-all" className="font-medium">Select All</Label>
             </div>
             <ScrollArea className="max-h-64 pr-4">
@@ -76,7 +76,7 @@ export function GoLiveDialog({
                             />
                             <Label htmlFor={`dest-${dest.id}`} className="flex-1 cursor-pointer">
                                 <div className="font-semibold">{dest.name}</div>
-                                <div className="text-xs text-muted-foreground">{dest.url}</div>
+                                <div className="text-xs text-muted-foreground truncate">{dest.url}</div>
                             </Label>
                         </div>
                         ))
