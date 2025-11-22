@@ -83,12 +83,12 @@ export function Scene({
         </div>
 
         {sidebarParticipants.length > 0 && (
-            <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto md:w-48 lg:w-64">
+            <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto w-full md:w-48 lg:w-64 pb-2 md:pb-0">
             {sidebarParticipants.map((p) => (
                 <div 
                     key={p.id}
                     className={cn(
-                        "md:h-auto w-40 md:w-full flex-shrink-0 cursor-pointer",
+                        "w-40 md:w-full flex-shrink-0 cursor-pointer",
                         layout === 'circle' && "aspect-square"
                     )}
                     onClick={() => setFocus(p.id)}
