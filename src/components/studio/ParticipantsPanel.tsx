@@ -49,7 +49,7 @@ export function ParticipantsPanel({
   }
 
   return (
-    <>
+    <div className="flex-1 flex flex-col min-h-0">
       <div className="p-4 border-b border-border/50">
         <h2 className="font-semibold">Participants ({participants.length})</h2>
       </div>
@@ -71,46 +71,48 @@ export function ParticipantsPanel({
                   {isOnStage && <Badge variant="secondary" className="gap-1 flex-shrink-0"><Check className="size-3 text-green-500"/> On Stage</Badge>}
                 </div>
               </div>
-              {host?.id !== p.id && !p.isScreenSharing &&(
-                <>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-8 flex-shrink-0"
-                    onClick={() => toggleMute(p.id)}
-                    aria-label={p.isMuted ? 'Unmute' : 'Mute'}
-                  >
-                    {p.isMuted ? (
-                      <MicOff className="size-4" />
-                    ) : (
-                      <Mic className="size-4" />
-                    )}
-                  </Button>
-                   <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-8 flex-shrink-0"
-                    onClick={() => toggleCamera(p.id)}
-                    aria-label={p.isCameraOn ? 'Hide camera' : 'Show camera'}
-                  >
-                    {p.isCameraOn && !p.isScreenSharing ? (
-                      <Video className="size-4" />
-                    ) : (
-                      <VideoOff className="size-4" />
-                    )}
-                  </Button>
-                </>
-              )}
-               <Button
-                variant="ghost"
-                size="icon"
-                className="size-8 flex-shrink-0"
-                onClick={() => setFocus(p.id)}
-                aria-label="Focus"
-                disabled={!isOnStage}
-              >
-                <Focus className="size-4" />
-              </Button>
+              <div className="flex items-center flex-shrink-0">
+                {host?.id !== p.id && !p.isScreenSharing &&(
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 flex-shrink-0"
+                      onClick={() => toggleMute(p.id)}
+                      aria-label={p.isMuted ? 'Unmute' : 'Mute'}
+                    >
+                      {p.isMuted ? (
+                        <MicOff className="size-4" />
+                      ) : (
+                        <Mic className="size-4" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 flex-shrink-0"
+                      onClick={() => toggleCamera(p.id)}
+                      aria-label={p.isCameraOn ? 'Hide camera' : 'Show camera'}
+                    >
+                      {p.isCameraOn && !p.isScreenSharing ? (
+                        <Video className="size-4" />
+                      ) : (
+                        <VideoOff className="size-4" />
+                      )}
+                    </Button>
+                  </>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 flex-shrink-0"
+                  onClick={() => setFocus(p.id)}
+                  aria-label="Focus"
+                  disabled={!isOnStage}
+                >
+                  <Focus className="size-4" />
+                </Button>
+              </div>
             </div>
           )})}
         </div>
@@ -122,6 +124,6 @@ export function ParticipantsPanel({
           Invite Guest
         </Button>
       </div>
-    </>
+    </div>
   );
 }

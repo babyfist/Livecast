@@ -113,7 +113,7 @@ const ChatTabContent = ({ messages, platform }: { messages: ChatMessageType[], p
 export function ChatPanel() {
 
   return (
-    <>
+    <div className="flex-1 flex flex-col min-h-0">
       <Tabs defaultValue="all" className="flex-1 flex flex-col min-h-0">
          <div className="p-4 border-b border-border/50">
             <h2 className="font-semibold">Live Chat</h2>
@@ -149,6 +149,6 @@ export function ChatPanel() {
             <Button><Send className="size-4" /></Button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
