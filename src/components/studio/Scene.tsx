@@ -27,7 +27,7 @@ export function Scene({
     <div className="flex-1 relative bg-black/80 p-4 flex flex-col gap-4 overflow-hidden">
       {participants.length === 0 && (
          <div className="flex-1 flex items-center justify-center">
-            <p className="text-muted-foreground text-lg">Turn on your camera to join the stage</p>
+            <p className="text-muted-foreground text-lg">Your guests will appear here once they join</p>
          </div>
       )}
       {focusedParticipant ? (

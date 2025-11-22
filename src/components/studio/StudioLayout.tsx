@@ -65,7 +65,42 @@ export function StudioLayout() {
           image: PlaceHolderImages.find((p) => p.id === 'host')!,
           stream: stream,
         };
-        setParticipants([hostParticipant]);
+        
+        const guestParticipants: Participant[] = [
+            {
+                id: 'guest1',
+                name: 'Alex',
+                isHost: false,
+                isMuted: true,
+                isCameraOn: false,
+                isScreenSharing: false,
+                image: PlaceHolderImages.find(p => p.id === 'guest1')!,
+                stream: undefined
+            },
+            {
+                id: 'guest2',
+                name: 'Samira',
+                isHost: false,
+                isMuted: true,
+                isCameraOn: false,
+                isScreenSharing: false,
+                image: PlaceHolderImages.find(p => p.id === 'guest2')!,
+                stream: undefined
+            },
+            {
+                id: 'guest3',
+                name: 'Kenji',
+                isHost: false,
+                isMuted: false,
+                isCameraOn: false,
+                isScreenSharing: false,
+                image: PlaceHolderImages.find(p => p.id === 'guest3')!,
+                stream: undefined
+            }
+        ]
+
+        setParticipants([hostParticipant, ...guestParticipants]);
+
       } catch (err) {
         console.error('Error accessing media devices.', err);
         setHasCameraPermission(false);
@@ -85,7 +120,7 @@ export function StudioLayout() {
   
 
   const onStageParticipants = useMemo(
-    () => participants.filter((p) => (p.isCameraOn && p.stream) || p.isScreenSharing),
+    () => participants.filter((p) => (p.isCameraOn && p.stream) || p.isScreenSharing || (!p.stream && p.isCameraOn)),
     [participants]
   );
   
@@ -101,10 +136,10 @@ export function StudioLayout() {
       participant.stream.getAudioTracks().forEach(track => {
         track.enabled = !track.enabled;
       });
-      setParticipants((prev) =>
-        prev.map((p) => (p.id === participantId ? { ...p, isMuted: !p.isMuted } : p))
-      );
     }
+    setParticipants((prev) =>
+      prev.map((p) => (p.id === participantId ? { ...p, isMuted: !p.isMuted } : p))
+    );
   };
 
   const toggleCamera = (participantId: string) => {
@@ -113,10 +148,10 @@ export function StudioLayout() {
       participant.stream.getVideoTracks().forEach(track => {
           track.enabled = !track.enabled;
       });
-      setParticipants((prev) =>
-        prev.map((p) => (p.id === participantId ? { ...p, isCameraOn: !p.isCameraOn } : p))
-      );
     }
+    setParticipants((prev) =>
+      prev.map((p) => (p.id === participantId ? { ...p, isCameraOn: !p.isCameraOn } : p))
+    );
   };
   
   const toggleScreenShare = async () => {

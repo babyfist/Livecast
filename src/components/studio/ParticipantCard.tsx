@@ -50,7 +50,7 @@ export function ParticipantCard({
     }
   };
 
-  const showVideo = (participant.isCameraOn || participant.isScreenSharing) && participant.stream;
+  const showVideo = participant.isCameraOn && participant.stream;
   const isCircle = layout === 'circle' && !isFocused && !participant.isScreenSharing;
 
   return (
