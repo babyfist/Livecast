@@ -199,13 +199,17 @@ export function StudioLayout() {
         };
         setParticipants(prev => [...prev, newScreenShare]);
         setLayout('focus');
-      } catch (error) {
-        console.error("Error starting screen share:", error);
-        toast({
-          variant: "destructive",
-          title: "Screen Share Failed",
-          description: "Could not start screen sharing. Please try again.",
-        });
+      } catch (error: any) {
+        if (error.name === 'NotAllowedError' || error.name === 'NotFoundError') {
+          console.log('Screen share cancelled by user.');
+        } else {
+            console.error("Error starting screen share:", error);
+            toast({
+              variant: "destructive",
+              title: "Screen Share Failed",
+              description: "Could not start screen sharing. Please try again.",
+            });
+        }
       }
     }
   };
