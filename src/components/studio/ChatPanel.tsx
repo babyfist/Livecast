@@ -134,10 +134,10 @@ export function ChatPanel() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
+      <div className="p-4 border-b border-border/50 shrink-0">
+          <h2 className="font-semibold">Live Chat</h2>
+      </div>
       <Tabs defaultValue="all" className="flex-1 flex flex-col min-h-0">
-         <div className="p-4 border-b border-border/50 shrink-0">
-            <h2 className="font-semibold">Live Chat</h2>
-        </div>
         <TabsList className="px-4 border-b border-border/50 justify-start rounded-none bg-transparent shrink-0">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="youtube"><PlatformIcon platform="youtube" /></TabsTrigger>
