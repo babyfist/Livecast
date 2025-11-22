@@ -43,10 +43,14 @@ export function Scene({
           {otherParticipants.length > 0 && (
              <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto md:w-48 lg:w-64">
              {otherParticipants.map((p) => (
-               <div key={p.id} className={cn(
-                 "md:h-auto w-40 md:w-full flex-shrink-0",
-                 layout === 'circle' && "aspect-square"
-               )}>
+               <div 
+                  key={p.id}
+                  className={cn(
+                    "md:h-auto w-40 md:w-full flex-shrink-0 cursor-pointer",
+                    layout === 'circle' && "aspect-square"
+                  )}
+                  onClick={() => setFocus(p.id)}
+                >
                  <ParticipantCard
                    participant={p}
                    isFocused={false}
@@ -71,10 +75,14 @@ export function Scene({
           )}
         >
           {participants.map((p) => (
-             <div key={p.id} className={cn(
-                 "flex flex-col items-center justify-center gap-2",
+             <div 
+              key={p.id}
+              className={cn(
+                 "flex flex-col items-center justify-center gap-2 cursor-pointer",
                  layout === 'circle' && "w-40 h-40 md:w-48 md:h-48 lg:w-56 lg:h-56"
-             )}>
+              )}
+              onClick={() => setFocus(p.id)}
+            >
               <ParticipantCard
                 participant={p}
                 isFocused={false}
