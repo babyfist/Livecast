@@ -135,7 +135,7 @@ export function SettingsDialog({ savedDestinations, onDestinationsChange }: Sett
                     <p className="text-sm text-destructive">{errors.destinations[index]?.url?.message}</p>
                   )}
                 </div>
-                <_c_ class="space-y-1">
+                <div className="space-y-1">
                   <Label htmlFor={`destinations.${index}.key`}>Stream Key</Label>
                   <Input
                     id={`destinations.${index}.key`}
@@ -146,7 +146,7 @@ export function SettingsDialog({ savedDestinations, onDestinationsChange }: Sett
                   {errors.destinations?.[index]?.key && (
                     <p className="text-sm text-destructive">{errors.destinations[index]?.key?.message}</p>
                   )}
-                </_c_>
+                </div>
                 <Button
                   type="button"
                   variant="ghost"
