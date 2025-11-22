@@ -21,7 +21,7 @@ export function ParticipantCard({
   layout
 }: ParticipantCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const mediaContainerRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
@@ -39,11 +39,15 @@ export function ParticipantCard({
   }, []);
 
   const toggleFullscreen = () => {
-    const element = containerRef.current;
+    const element = mediaContainerRef.current;
     if (!element) return;
+    
+    // Find the actual video or image element to make it fullscreen
+    const mediaElement = element.querySelector('video') || element.querySelector('img');
+    if (!mediaElement) return;
 
     if (!document.fullscreenElement) {
-      element.requestFullscreen().catch(err => {
+      mediaElement.requestFullscreen().catch(err => {
         alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
       });
     } else {
@@ -52,12 +56,12 @@ export function ParticipantCard({
   };
 
   const showVideo = participant.isCameraOn && participant.stream;
-  const isCircle = layout === 'circle' && !isFocused && !participant.isScreenSharing;
+  const isCircle = layout === 'circle';
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center gap-2 group">
         <div
-            ref={containerRef}
+            ref={mediaContainerRef}
             className={cn(
                 "w-full h-full bg-card/50 border-0 overflow-hidden relative transition-all duration-300",
                 isCircle ? "rounded-full aspect-square" : "rounded-lg",
@@ -90,9 +94,8 @@ export function ParticipantCard({
                 </div>
             )}
             
-            {!showVideo && !isCircle && !isFullscreen && <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />}
+            {!showVideo && !isCircle && <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />}
             
-            {!isFullscreen && (
             <>
                 <div className="absolute top-2 left-2 flex items-center gap-2">
                     {participant.isMuted && (
@@ -126,14 +129,11 @@ export function ParticipantCard({
                     </Button>
                 </div>
             </>
-            )}
         </div>
-        {!isFullscreen && (
-          <div className="flex items-center gap-2 text-sm font-medium text-foreground drop-shadow-md max-w-full truncate">
-              {participant.isScreenSharing && <Monitor className="size-4 text-accent" />}
-              {participant.name}
-          </div>
-        )}
+        <div className="flex items-center gap-2 text-sm font-medium text-foreground drop-shadow-md max-w-full truncate">
+            {participant.isScreenSharing && <Monitor className="size-4 text-accent" />}
+            {participant.name}
+        </div>
     </div>
   );
 }

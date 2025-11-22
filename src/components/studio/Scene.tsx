@@ -30,6 +30,7 @@ export function Scene({
     return screenShare || participants[0];
   }, [participants, layout]);
 
+  // Determine the focused participant based on layout mode (auto for 'focus', manual for others)
   const focusedParticipant = layout === 'focus' ? autoFocusParticipant : manualFocusParticipant;
   
   const otherParticipants = useMemo(() => {
@@ -39,8 +40,8 @@ export function Scene({
 
 
   const isFocusView = !!focusedParticipant;
-  const mainParticipants = isFocusView ? [focusedParticipant] : participants;
-  const sidebarParticipants = isFocusView ? otherParticipants : [];
+  // In focus view, there's one main participant. In grid/circle view, all 'otherParticipants' are the main participants.
+  const mainParticipants = isFocusView ? [focusedParticipant] : otherParticipants;
 
   return (
     <div className="flex-1 relative bg-black/80 p-4 flex flex-col gap-4 overflow-hidden">
@@ -50,7 +51,7 @@ export function Scene({
          </div>
       )}
       
-      <div className={cn("flex-1 flex gap-4 h-full min-h-0", sidebarParticipants.length > 0 ? "flex-col md:flex-row" : "flex-col")}>
+      <div className="flex-1 flex flex-col gap-4 h-full min-h-0 relative">
         <div
             className={cn(
                 'flex-1 transition-all duration-300 min-h-0 min-w-0',
@@ -83,14 +84,13 @@ export function Scene({
             ))}
         </div>
 
-        {sidebarParticipants.length > 0 && (
-            <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto w-full md:w-48 lg:w-64 pb-2 md:pb-0">
-            {sidebarParticipants.map((p) => (
+        {isFocusView && otherParticipants.length > 0 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-4 justify-center w-full p-2">
+            {otherParticipants.map((p) => (
                 <div 
                     key={p.id}
                     className={cn(
-                        "flex-shrink-0 cursor-pointer w-40 md:w-full",
-                        layout === 'circle' ? 'h-auto aspect-square' : 'aspect-video'
+                        "flex-shrink-0 cursor-pointer w-24 h-auto aspect-square md:w-28 lg:w-32 transition-all duration-300 hover:scale-105"
                     )}
                     onClick={() => setFocus(p.id)}
                     >
@@ -98,7 +98,7 @@ export function Scene({
                         participant={p}
                         isFocused={false}
                         onFocus={() => setFocus(p.id)}
-                        layout={layout}
+                        layout="circle" // Always circles when in the bottom bar
                     />
                 </div>
             ))}
