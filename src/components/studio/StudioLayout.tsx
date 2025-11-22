@@ -297,7 +297,7 @@ export function StudioLayout() {
         />
       </main>
 
-      <aside className="w-full lg:w-80 bg-card/50 border-l border-border/50 flex flex-col h-full">
+      <aside className="w-full lg:w-80 bg-card/50 border-l border-border/50 flex flex-col h-full lg:max-h-screen">
         <Tabs defaultValue="participants" className="flex-1 flex flex-col min-h-0">
             <TabsList className="grid w-full grid-cols-2 rounded-none shrink-0">
                 <TabsTrigger value="participants">

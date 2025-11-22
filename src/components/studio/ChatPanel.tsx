@@ -101,7 +101,7 @@ const ChatMessage = ({ msg }: { msg: ChatMessageType }) => (
       <AvatarImage src={msg.author.avatarUrl} />
       <AvatarFallback>{msg.author.name.charAt(0)}</AvatarFallback>
     </Avatar>
-    <div className="flex-1">
+    <div className="flex-1 min-w-0">
       <div className="flex items-center gap-2">
         <span className="font-semibold">{msg.author.name}</span>
         <PlatformIcon platform={msg.platform} />
