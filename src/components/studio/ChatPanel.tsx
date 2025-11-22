@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '../ui/input';
@@ -9,66 +9,6 @@ import { Send } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import type { ChatMessage as ChatMessageType, ChatPlatform, RtmpDestination } from '@/lib/types';
 import { Separator } from '../ui/separator';
-
-// Simulated chat messages
-const simulatedMessages: ChatMessageType[] = [
-  {
-    id: '1',
-    platform: 'youtube',
-    author: { name: 'YT_User1', avatarUrl: 'https://i.pravatar.cc/150?u=yt1' },
-    message: 'This is an awesome stream!',
-    timestamp: new Date(Date.now() - 60000 * 5),
-  },
-  {
-    id: '2',
-    platform: 'twitch',
-    author: { name: 'TwitchViewer', avatarUrl: 'https://i.pravatar.cc/150?u=twitch1' },
-    message: 'PogChamp',
-    timestamp: new Date(Date.now() - 60000 * 4),
-  },
-  {
-    id: '3',
-    platform: 'kick',
-    author: { name: 'KickFan', avatarUrl: 'https://i.pravatar.cc/150?u=kick1' },
-    message: 'Let\'s gooo! 🚀',
-    timestamp: new Date(Date.now() - 60000 * 3),
-  },
-  {
-    id: '4',
-    platform: 'youtube',
-    author: { name: 'Commenter', avatarUrl: 'https://i.pravatar.cc/150?u=yt2' },
-    message: 'Great content, very informative.',
-    timestamp: new Date(Date.now() - 60000 * 2),
-  },
-    {
-    id: '5',
-    platform: 'x',
-    author: { name: 'X-User', avatarUrl: 'https://i.pravatar.cc/150?u=x1' },
-    message: 'Broadcasting live from the studio!',
-    timestamp: new Date(Date.now() - 60000 * 1),
-  },
-   {
-    id: '6',
-    platform: 'youtube',
-    author: { name: 'NewViewer', avatarUrl: 'https://i.pravatar.cc/150?u=yt3' },
-    message: 'Just joined, what did I miss?',
-    timestamp: new Date(Date.now() - 60000 * 0.5),
-  },
-    {
-    id: '7',
-    platform: 'twitch',
-    author: { name: 'AnotherTwitch', avatarUrl: 'https://i.pravatar.cc/150?u=twitch2' },
-    message: 'This is a longer message to test how the text wrapping works in the chat panel when a user types a lot of things. Hopefully it wraps correctly and does not overflow the container or cause any weird layout issues. We will see soon enough!',
-    timestamp: new Date(Date.now() - 60000 * 0.2),
-  },
-   {
-    id: '8',
-    platform: 'youtube',
-    author: { name: 'YT_Fan', avatarUrl: 'https://i.pravatar.cc/150?u=yt4' },
-    message: 'Hello world!',
-    timestamp: new Date(),
-  },
-];
 
 const PlatformIcon = ({ platform }: { platform: ChatPlatform }) => {
   switch (platform) {
@@ -105,7 +45,7 @@ const ChatMessage = ({ msg }: { msg: ChatMessageType }) => (
         <span className="font-semibold">{msg.author.name}</span>
         <PlatformIcon platform={msg.platform} />
         <span className="text-xs text-muted-foreground">
-          {msg.timestamp.toLocaleTimeString()}
+          {new Date(msg.timestamp).toLocaleTimeString()}
         </span>
       </div>
       <p className="text-muted-foreground break-words">{msg.message}</p>
@@ -131,7 +71,7 @@ const ChatTabContent = ({ messages, platform, activeDestinations }: { messages: 
     const platformIsLive = platform === 'all' ? livePlatforms.length > 0 : livePlatforms.includes(platform);
     const noMessagesText = !platformIsLive 
         ? "Stream is not live on this platform." 
-        : "No messages yet.";
+        : "No messages yet. Waiting for server...";
 
     return (
         <ScrollArea className="flex-1 p-4">
@@ -149,8 +89,45 @@ const ChatTabContent = ({ messages, platform, activeDestinations }: { messages: 
 
 export function ChatPanel({ activeDestinations }: { activeDestinations: RtmpDestination[] }) {
   const [activeTab, setActiveTab] = useState<ChatPlatform | 'all'>('all');
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
 
   const livePlatforms = useMemo(() => activeDestinations.map(d => d.platform), [activeDestinations]);
+
+  useEffect(() => {
+    if (livePlatforms.length === 0) {
+      setMessages([]);
+      return;
+    }
+
+    let isCancelled = false;
+
+    const fetchMessages = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/chat');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data: ChatMessageType[] = await response.json();
+        if (!isCancelled) {
+          setMessages(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch chat messages:", error);
+        if (!isCancelled) {
+          setMessages([]); // Clear messages on error
+        }
+      }
+    };
+
+    fetchMessages(); // Initial fetch
+    const intervalId = setInterval(fetchMessages, 3000); // Poll every 3 seconds
+
+    return () => {
+      isCancelled = true;
+      clearInterval(intervalId);
+    };
+  }, [livePlatforms]);
+
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
@@ -168,7 +145,7 @@ export function ChatPanel({ activeDestinations }: { activeDestinations: RtmpDest
         
         <TabsContent value={activeTab} className="flex-1 flex flex-col min-h-0 mt-0">
              <ChatTabContent 
-                messages={simulatedMessages} 
+                messages={messages} 
                 platform={activeTab} 
                 activeDestinations={activeDestinations} 
              />
