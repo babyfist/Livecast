@@ -3,13 +3,12 @@
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Send } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { cn } from '@/lib/utils';
 import type { ChatMessage as ChatMessageType, ChatPlatform } from '@/lib/types';
+import { Separator } from '../ui/separator';
 
 
 // Simulated chat messages
@@ -48,6 +47,13 @@ const simulatedMessages: ChatMessageType[] = [
     author: { name: 'X-User', avatarUrl: 'https://i.pravatar.cc/150?u=x1' },
     message: 'Broadcasting live from the studio!',
     timestamp: new Date(Date.now() - 60000 * 1),
+  },
+   {
+    id: '6',
+    platform: 'youtube',
+    author: { name: 'NewViewer', avatarUrl: 'https://i.pravatar.cc/150?u=yt3' },
+    message: 'Just joined, what did I miss?',
+    timestamp: new Date(Date.now() - 60000 * 0.5),
   },
 ];
 
@@ -97,7 +103,7 @@ const ChatMessage = ({ msg }: { msg: ChatMessageType }) => (
 const ChatTabContent = ({ messages, platform }: { messages: ChatMessageType[], platform: ChatPlatform | 'all' }) => {
     const filteredMessages = platform === 'all' ? messages : messages.filter(m => m.platform === platform);
     return (
-        <ScrollArea className="h-full p-4">
+        <ScrollArea className="flex-1 p-4">
             <div className="space-y-4">
                 {filteredMessages.length > 0 ? (
                     filteredMessages.map(msg => <ChatMessage key={msg.id} msg={msg} />)
