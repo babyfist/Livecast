@@ -44,7 +44,7 @@ export function ParticipantsPanel({
   }
 
   return (
-    <aside className="w-full lg:w-80 bg-card/50 border-l border-border/50 flex flex-col">
+    <>
       <div className="p-4 border-b border-border/50">
         <h2 className="font-semibold">Participants ({participants.length})</h2>
       </div>
@@ -61,7 +61,10 @@ export function ParticipantsPanel({
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <div className="text-sm font-medium flex items-center gap-2">{p.name} {isOnStage && <Badge variant="secondary" className="gap-1"><Check className="size-3 text-green-500"/> On Stage</Badge>}</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{p.name}</span>
+                  {isOnStage && <Badge variant="secondary" className="gap-1"><Check className="size-3 text-green-500"/> On Stage</Badge>}
+                </div>
               </div>
               {host?.id !== p.id && !p.isScreenSharing &&(
                 <>
@@ -114,6 +117,6 @@ export function ParticipantsPanel({
           Invite Guest
         </Button>
       </div>
-    </aside>
+    </>
   );
 }

@@ -19,3 +19,16 @@ export type RtmpDestination = {
     url: string;
     key: string;
 };
+
+export type ChatPlatform = 'youtube' | 'twitch' | 'kick' | 'x';
+
+export type ChatMessage = {
+  id: string;
+  platform: ChatPlatform;
+  author: {
+    name: string;
+    avatarUrl?: string;
+  };
+  message: string;
+  timestamp: Date;
+};

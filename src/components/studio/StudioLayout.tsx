@@ -9,9 +9,12 @@ import { Controls } from './Controls';
 import { ParticipantsPanel } from './ParticipantsPanel';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Video } from 'lucide-react';
+import { MessagesSquare, Users, Video } from 'lucide-react';
 import { GoLiveDialog } from './GoLiveDialog';
 import { SettingsDialog } from './SettingsDialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ChatPanel } from './ChatPanel';
+
 
 export function StudioLayout() {
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -293,14 +296,35 @@ export function StudioLayout() {
           setLayout={setLayout}
         />
       </main>
-      <ParticipantsPanel
-        participants={participants}
-        onStageParticipants={onStageParticipants}
-        setParticipants={setParticipants}
-        toggleMute={toggleMute}
-        toggleCamera={toggleCamera}
-        setFocus={setFocus}
-      />
+
+      <aside className="w-full lg:w-80 bg-card/50 border-l border-border/50 flex flex-col">
+        <Tabs defaultValue="participants" className="flex flex-col flex-1">
+            <TabsList className="grid w-full grid-cols-2 rounded-none">
+                <TabsTrigger value="participants">
+                    <Users className="mr-2 size-4" />
+                    Participants
+                </TabsTrigger>
+                <TabsTrigger value="chat">
+                    <MessagesSquare className="mr-2 size-4" />
+                    Chat
+                </TabsTrigger>
+            </TabsList>
+            <TabsContent value="participants" className="flex-1 flex flex-col mt-0">
+                <ParticipantsPanel
+                    participants={participants}
+                    onStageParticipants={onStageParticipants}
+                    setParticipants={setParticipants}
+                    toggleMute={toggleMute}
+                    toggleCamera={toggleCamera}
+                    setFocus={setFocus}
+                />
+            </TabsContent>
+            <TabsContent value="chat" className="flex-1 flex flex-col mt-0">
+                <ChatPanel />
+            </TabsContent>
+        </Tabs>
+      </aside>
+
        <GoLiveDialog 
         open={isGoLiveDialogOpen}
         onOpenChange={setGoLiveDialogOpen}
