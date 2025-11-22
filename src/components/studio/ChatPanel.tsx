@@ -97,8 +97,8 @@ const ChatMessage = ({ msg }: { msg: ChatMessageType }) => (
 const ChatTabContent = ({ messages, platform }: { messages: ChatMessageType[], platform: ChatPlatform | 'all' }) => {
     const filteredMessages = platform === 'all' ? messages : messages.filter(m => m.platform === platform);
     return (
-        <ScrollArea className="flex-1">
-            <div className="p-4 space-y-4">
+        <ScrollArea className="flex-1 p-4">
+            <div className="space-y-4">
                 {filteredMessages.length > 0 ? (
                     filteredMessages.map(msg => <ChatMessage key={msg.id} msg={msg} />)
                 ) : (

@@ -71,13 +71,13 @@ export function ParticipantsPanel({
                   {isOnStage && <Badge variant="secondary" className="gap-1 flex-shrink-0"><Check className="size-3 text-green-500"/> On Stage</Badge>}
                 </div>
               </div>
-              <div className="flex items-center flex-shrink-0">
+              <div className="flex items-center shrink-0">
                 {host?.id !== p.id && !p.isScreenSharing &&(
                   <>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="size-8 flex-shrink-0"
+                      className="size-8 shrink-0"
                       onClick={() => toggleMute(p.id)}
                       aria-label={p.isMuted ? 'Unmute' : 'Mute'}
                     >
@@ -90,7 +90,7 @@ export function ParticipantsPanel({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="size-8 flex-shrink-0"
+                      className="size-8 shrink-0"
                       onClick={() => toggleCamera(p.id)}
                       aria-label={p.isCameraOn ? 'Hide camera' : 'Show camera'}
                     >
@@ -105,7 +105,7 @@ export function ParticipantsPanel({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="size-8 flex-shrink-0"
+                  className="size-8 shrink-0"
                   onClick={() => setFocus(p.id)}
                   aria-label="Focus"
                   disabled={!isOnStage}
