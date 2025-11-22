@@ -12,3 +12,10 @@ export type Participant = {
 };
 
 export type LayoutMode = 'grid' | 'circle';
+
+export type RtmpDestination = {
+    id: string;
+    name: string;
+    url: string;
+    key: string;
+};
