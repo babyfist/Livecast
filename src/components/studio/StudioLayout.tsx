@@ -29,7 +29,7 @@ export function StudioLayout() {
   
   const [isGoLiveDialogOpen, setGoLiveDialogOpen] = useState(false);
   const [rtmpDestinations, setRtmpDestinations] = useState<RtmpDestination[]>([]);
-  const [activeDestinations, setActiveDestinations] = useState<string[]>([]);
+  const [activeDestinations, setActiveDestinations] = useState<RtmpDestination[]>([]);
 
 
   const host: Participant | undefined = useMemo(() => participants.find(p => p.isHost), [participants]);
@@ -236,7 +236,8 @@ export function StudioLayout() {
   };
   
   const handleStartStreaming = (selectedIds: string[]) => {
-    setActiveDestinations(selectedIds);
+    const selectedDestinations = rtmpDestinations.filter(d => selectedIds.includes(d.id));
+    setActiveDestinations(selectedDestinations);
     setIsLive(true);
     setGoLiveDialogOpen(false);
     toast({
@@ -313,7 +314,7 @@ export function StudioLayout() {
                     Chat
                 </TabsTrigger>
             </TabsList>
-            <TabsContent value="participants" className="flex-1 min-h-0">
+            <TabsContent value="participants" className="flex-1 flex flex-col min-h-0">
                 <ParticipantsPanel
                     participants={participants}
                     onStageParticipants={onStageParticipants}
@@ -323,8 +324,8 @@ export function StudioLayout() {
                     setFocus={setFocus}
                 />
             </TabsContent>
-            <TabsContent value="chat" className="flex-1 flex flex-col min-h-0">
-                <ChatPanel />
+            <TabsContent value="chat" className="flex-1 flex flex-col min-h-0 mt-0">
+                <ChatPanel activeDestinations={activeDestinations} />
             </TabsContent>
         </Tabs>
       </aside>

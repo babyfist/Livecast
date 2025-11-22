@@ -13,14 +13,16 @@ export type Participant = {
 
 export type LayoutMode = 'grid' | 'circle' | 'focus';
 
+export type ChatPlatform = 'youtube' | 'twitch' | 'kick' | 'x';
+
 export type RtmpDestination = {
     id: string;
     name: string;
     url: string;
     key: string;
+    platform: ChatPlatform;
+    channelId: string;
 };
-
-export type ChatPlatform = 'youtube' | 'twitch' | 'kick' | 'x';
 
 export type ChatMessage = {
   id: string;

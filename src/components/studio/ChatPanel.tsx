@@ -1,15 +1,14 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, { useMemo, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Send } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import type { ChatMessage as ChatMessageType, ChatPlatform } from '@/lib/types';
+import type { ChatMessage as ChatMessageType, ChatPlatform, RtmpDestination } from '@/lib/types';
 import { Separator } from '../ui/separator';
-
 
 // Simulated chat messages
 const simulatedMessages: ChatMessageType[] = [
@@ -114,15 +113,33 @@ const ChatMessage = ({ msg }: { msg: ChatMessageType }) => (
   </div>
 );
 
-const ChatTabContent = ({ messages, platform }: { messages: ChatMessageType[], platform: ChatPlatform | 'all' }) => {
-    const filteredMessages = platform === 'all' ? messages : messages.filter(m => m.platform === platform);
+const ChatTabContent = ({ messages, platform, activeDestinations }: { messages: ChatMessageType[], platform: ChatPlatform | 'all', activeDestinations: RtmpDestination[] }) => {
+    const livePlatforms = useMemo(() => activeDestinations.map(d => d.platform), [activeDestinations]);
+
+    const filteredMessages = useMemo(() => {
+        if (platform === 'all') {
+            // Show messages from all currently live platforms
+            return messages.filter(m => livePlatforms.includes(m.platform));
+        }
+        // Show messages for a specific platform only if it's live
+        if (livePlatforms.includes(platform)) {
+            return messages.filter(m => m.platform === platform);
+        }
+        return [];
+    }, [platform, messages, livePlatforms]);
+
+    const platformIsLive = platform === 'all' ? livePlatforms.length > 0 : livePlatforms.includes(platform);
+    const noMessagesText = !platformIsLive 
+        ? "Stream is not live on this platform." 
+        : "No messages yet.";
+
     return (
         <ScrollArea className="flex-1 p-4">
             <div className="space-y-4">
                 {filteredMessages.length > 0 ? (
                     filteredMessages.map(msg => <ChatMessage key={msg.id} msg={msg} />)
                 ) : (
-                    <div className="text-center text-muted-foreground py-10">No messages yet.</div>
+                    <div className="text-center text-muted-foreground py-10">{noMessagesText}</div>
                 )}
             </div>
         </ScrollArea>
@@ -130,8 +147,10 @@ const ChatTabContent = ({ messages, platform }: { messages: ChatMessageType[], p
 };
 
 
-export function ChatPanel() {
+export function ChatPanel({ activeDestinations }: { activeDestinations: RtmpDestination[] }) {
   const [activeTab, setActiveTab] = useState<ChatPlatform | 'all'>('all');
+
+  const livePlatforms = useMemo(() => activeDestinations.map(d => d.platform), [activeDestinations]);
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
@@ -140,17 +159,20 @@ export function ChatPanel() {
       </div>
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="flex-1 flex flex-col min-h-0">
         <TabsList className="px-4 border-b border-border/50 justify-start rounded-none bg-transparent shrink-0">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="youtube"><PlatformIcon platform="youtube" /></TabsTrigger>
-            <TabsTrigger value="twitch"><PlatformIcon platform="twitch" /></TabsTrigger>
-            <TabsTrigger value="kick"><PlatformIcon platform="kick" /></TabsTrigger>
-            <TabsTrigger value="x"><PlatformIcon platform="x" /></TabsTrigger>
+            <TabsTrigger value="all" disabled={livePlatforms.length === 0}>All</TabsTrigger>
+            <TabsTrigger value="youtube" disabled={!livePlatforms.includes('youtube')}><PlatformIcon platform="youtube" /></TabsTrigger>
+            <TabsTrigger value="twitch" disabled={!livePlatforms.includes('twitch')}><PlatformIcon platform="twitch" /></TabsTrigger>
+            <TabsTrigger value="kick" disabled={!livePlatforms.includes('kick')}><PlatformIcon platform="kick" /></TabsTrigger>
+            <TabsTrigger value="x" disabled={!livePlatforms.includes('x')}><PlatformIcon platform="x" /></TabsTrigger>
         </TabsList>
         
         <TabsContent value={activeTab} className="flex-1 flex flex-col min-h-0 mt-0">
-            <ChatTabContent messages={simulatedMessages} platform={activeTab} />
+             <ChatTabContent 
+                messages={simulatedMessages} 
+                platform={activeTab} 
+                activeDestinations={activeDestinations} 
+             />
         </TabsContent>
-
       </Tabs>
       <Separator />
       <div className="p-4 shrink-0">
