@@ -55,6 +55,20 @@ const simulatedMessages: ChatMessageType[] = [
     message: 'Just joined, what did I miss?',
     timestamp: new Date(Date.now() - 60000 * 0.5),
   },
+    {
+    id: '7',
+    platform: 'twitch',
+    author: { name: 'AnotherTwitch', avatarUrl: 'https://i.pravatar.cc/150?u=twitch2' },
+    message: 'This is a longer message to test how the text wrapping works in the chat panel when a user types a lot of things. Hopefully it wraps correctly and does not overflow the container or cause any weird layout issues. We will see soon enough!',
+    timestamp: new Date(Date.now() - 60000 * 0.2),
+  },
+   {
+    id: '8',
+    platform: 'youtube',
+    author: { name: 'YT_Fan', avatarUrl: 'https://i.pravatar.cc/150?u=yt4' },
+    message: 'Hello world!',
+    timestamp: new Date(),
+  },
 ];
 
 const PlatformIcon = ({ platform }: { platform: ChatPlatform }) => {
@@ -95,7 +109,7 @@ const ChatMessage = ({ msg }: { msg: ChatMessageType }) => (
           {msg.timestamp.toLocaleTimeString()}
         </span>
       </div>
-      <p className="text-muted-foreground">{msg.message}</p>
+      <p className="text-muted-foreground break-words">{msg.message}</p>
     </div>
   </div>
 );
@@ -121,10 +135,10 @@ export function ChatPanel() {
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <Tabs defaultValue="all" className="flex-1 flex flex-col min-h-0">
-         <div className="p-4 border-b border-border/50">
+         <div className="p-4 border-b border-border/50 shrink-0">
             <h2 className="font-semibold">Live Chat</h2>
         </div>
-        <TabsList className="px-4 border-b border-border/50 justify-start rounded-none bg-transparent">
+        <TabsList className="px-4 border-b border-border/50 justify-start rounded-none bg-transparent shrink-0">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="youtube"><PlatformIcon platform="youtube" /></TabsTrigger>
             <TabsTrigger value="twitch"><PlatformIcon platform="twitch" /></TabsTrigger>
@@ -149,7 +163,7 @@ export function ChatPanel() {
         </TabsContent>
       </Tabs>
       <Separator />
-      <div className="p-4">
+      <div className="p-4 shrink-0">
         <div className="flex gap-2">
             <Input placeholder="Send a message..." />
             <Button><Send className="size-4" /></Button>

@@ -297,9 +297,9 @@ export function StudioLayout() {
         />
       </main>
 
-      <aside className="w-full lg:w-80 bg-card/50 border-l border-border/50 flex flex-col max-h-screen lg:max-h-full">
+      <aside className="w-full lg:w-80 bg-card/50 border-l border-border/50 flex flex-col h-full">
         <Tabs defaultValue="participants" className="flex-1 flex flex-col min-h-0">
-            <TabsList className="grid w-full grid-cols-2 rounded-none">
+            <TabsList className="grid w-full grid-cols-2 rounded-none shrink-0">
                 <TabsTrigger value="participants">
                     <Users className="mr-2 size-4" />
                     Participants
@@ -309,7 +309,7 @@ export function StudioLayout() {
                     Chat
                 </TabsTrigger>
             </TabsList>
-            <TabsContent value="participants" className="flex-1 flex flex-col mt-0 min-h-0">
+            <TabsContent value="participants" className="flex-1 flex flex-col min-h-0">
                 <ParticipantsPanel
                     participants={participants}
                     onStageParticipants={onStageParticipants}
@@ -319,7 +319,7 @@ export function StudioLayout() {
                     setFocus={setFocus}
                 />
             </TabsContent>
-            <TabsContent value="chat" className="flex-1 flex flex-col mt-0 min-h-0">
+            <TabsContent value="chat" className="flex-1 flex flex-col min-h-0">
                 <ChatPanel />
             </TabsContent>
         </Tabs>
