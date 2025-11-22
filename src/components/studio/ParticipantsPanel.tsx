@@ -67,7 +67,7 @@ export function ParticipantsPanel({
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium truncate">{p.name}</span>
+                  <p className="text-sm font-medium truncate">{p.name}</p>
                   {isOnStage && <Badge variant="secondary" className="gap-1 flex-shrink-0"><Check className="size-3 text-green-500"/> On Stage</Badge>}
                 </div>
               </div>
