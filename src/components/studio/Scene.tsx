@@ -88,8 +88,8 @@ export function Scene({
                 <div 
                     key={p.id}
                     className={cn(
-                        "w-40 md:w-full flex-shrink-0 cursor-pointer",
-                        layout === 'circle' && "aspect-square"
+                        "flex-shrink-0 cursor-pointer w-40 md:w-full",
+                        layout === 'circle' && 'h-40 md:h-auto md:aspect-square'
                     )}
                     onClick={() => setFocus(p.id)}
                     >
