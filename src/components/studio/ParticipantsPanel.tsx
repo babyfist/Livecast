@@ -61,7 +61,7 @@ export function ParticipantsPanel({
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="text-sm font-medium flex items-center gap-2">{p.name} {isOnStage && <Badge variant="secondary" className="gap-1"><Check className="size-3 text-green-500"/> On Stage</Badge>}</p>
+                <div className="text-sm font-medium flex items-center gap-2">{p.name} {isOnStage && <Badge variant="secondary" className="gap-1"><Check className="size-3 text-green-500"/> On Stage</Badge>}</div>
               </div>
               {host?.id !== p.id && !p.isScreenSharing &&(
                 <>
