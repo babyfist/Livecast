@@ -58,60 +58,61 @@ export function ParticipantsPanel({
           {participants.map((p) => {
             const isOnStage = onStageParticipants.some(onstage => onstage.id === p.id);
             return (
-            <div key={p.id} className="flex items-center gap-3">
+            <div key={p.id} className="flex items-start gap-3">
               <Avatar>
                 <AvatarImage src={p.isScreenSharing ? undefined : p.image.imageUrl} alt={p.name} />
                 <AvatarFallback>
                   <User className="size-5" />
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 flex flex-col min-w-0">
                 <div className="flex items-center gap-2">
                   <p className="font-medium truncate text-sm">{p.name}</p>
                   {isOnStage && <Badge variant="secondary" className="gap-1 flex-shrink-0"><Check className="size-3 text-green-500"/> On Stage</Badge>}
                 </div>
-              </div>
-              <div className="flex items-center shrink-0">
-                {host?.id !== p.id && !p.isScreenSharing &&(
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 shrink-0"
-                      onClick={() => toggleMute(p.id)}
-                      aria-label={p.isMuted ? 'Unmute' : 'Mute'}
-                    >
-                      {p.isMuted ? (
-                        <MicOff className="size-4" />
-                      ) : (
-                        <Mic className="size-4" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="size-8 shrink-0"
-                      onClick={() => toggleCamera(p.id)}
-                      aria-label={p.isCameraOn ? 'Hide camera' : 'Show camera'}
-                    >
-                      {p.isCameraOn && !p.isScreenSharing ? (
-                        <Video className="size-4" />
-                      ) : (
-                        <VideoOff className="size-4" />
-                      )}
-                    </Button>
-                  </>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-8 shrink-0"
-                  onClick={() => setFocus(p.id)}
-                  aria-label="Focus"
-                  disabled={!isOnStage}
-                >
-                  <Focus className="size-4" />
-                </Button>
+
+                <div className="flex items-center -ml-2">
+                  {host?.id !== p.id && !p.isScreenSharing &&(
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 shrink-0"
+                        onClick={() => toggleMute(p.id)}
+                        aria-label={p.isMuted ? 'Unmute' : 'Mute'}
+                      >
+                        {p.isMuted ? (
+                          <MicOff className="size-4" />
+                        ) : (
+                          <Mic className="size-4" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="size-8 shrink-0"
+                        onClick={() => toggleCamera(p.id)}
+                        aria-label={p.isCameraOn ? 'Hide camera' : 'Show camera'}
+                      >
+                        {p.isCameraOn && !p.isScreenSharing ? (
+                          <Video className="size-4" />
+                        ) : (
+                          <VideoOff className="size-4" />
+                        )}
+                      </Button>
+                    </>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 shrink-0"
+                    onClick={() => setFocus(p.id)}
+                    aria-label="Focus"
+                    disabled={!isOnStage}
+                  >
+                    <Focus className="size-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           )})}
