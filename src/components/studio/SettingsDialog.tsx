@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Settings, Plus, Trash2, Server } from 'lucide-react';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from '@/hooks/use-toast';
@@ -36,37 +36,12 @@ const formSchema = z.object({
 type DestinationFormValues = z.infer<typeof formSchema>;
 export type RtmpDestination = z.infer<typeof destinationSchema>;
 
-const useRtmpDestinations = () => {
-    const [destinations, setDestinations] = useState<RtmpDestination[]>([]);
-  
-    useEffect(() => {
-      try {
-        const item = window.localStorage.getItem('rtmp-destinations');
-        const parsedItem = item ? JSON.parse(item) : [];
-        if (Array.isArray(parsedItem)) {
-            setDestinations(parsedItem);
-        }
-      } catch (error) {
-        console.warn('Error reading localStorage "rtmp-destinations":', error);
-        setDestinations([]);
-      }
-    }, []);
-  
-    const saveDestinations = (newDestinations: RtmpDestination[]) => {
-      try {
-        setDestinations(newDestinations);
-        window.localStorage.setItem('rtmp-destinations', JSON.stringify(newDestinations));
-      } catch (error) {
-        console.warn('Error setting localStorage "rtmp-destinations":', error);
-      }
-    };
-  
-    return { destinations, saveDestinations };
-  };
-  
+interface SettingsDialogProps {
+    savedDestinations: RtmpDestination[];
+    onDestinationsChange: (destinations: RtmpDestination[]) => void;
+}
 
-export function SettingsDialog() {
-  const { destinations: savedDestinations, saveDestinations } = useRtmpDestinations();
+export function SettingsDialog({ savedDestinations, onDestinationsChange }: SettingsDialogProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
 
@@ -95,7 +70,15 @@ export function SettingsDialog() {
   });
 
   const onSubmit = (data: DestinationFormValues) => {
-    saveDestinations(data.destinations);
+    // Save to local storage
+    try {
+        window.localStorage.setItem('rtmp-destinations', JSON.stringify(data.destinations));
+    } catch (error) {
+        console.warn('Error setting localStorage "rtmp-destinations":', error);
+    }
+    // Propagate change to parent
+    onDestinationsChange(data.destinations);
+
     toast({
       title: 'Settings Saved',
       description: 'Your RTMP destinations have been updated.',

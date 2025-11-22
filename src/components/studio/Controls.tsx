@@ -82,7 +82,7 @@ export function Controls({
     const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
     const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
-    return `${h}:${m}:${s}`;
+    return isLive ? `${h}:${m}:${s}` : "Go Live";
   };
 
   const handleSceneSelect = async (sceneDescription: string) => {
@@ -153,17 +153,11 @@ export function Controls({
             onClick={handleGoLive}
             className={cn(
               "min-w-36",
-              isLive ? 'bg-destructive hover:bg-destructive/90' : 'bg-primary hover:bg-primary/90'
+              isLive ? 'bg-destructive hover:bg-destructive/90' : 'bg-green-600 hover:bg-green-700'
             )}
           >
-            {isLive ? (
-              <>
-                <Podcast className="mr-2 size-5 animate-pulse" />
-                <span>{formatTime(elapsedTime)}</span>
-              </>
-            ) : (
-              'Go Live'
-            )}
+            <Podcast className={cn("mr-2 size-5", isLive && "animate-pulse")} />
+            <span>{formatTime(elapsedTime)}</span>
           </Button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import type { Participant, LayoutMode } from '@/lib/types';
+import type { LayoutMode, Participant, RtmpDestination } from '@/lib/types';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Header } from './Header';
 import { Scene } from './Scene';
@@ -10,6 +10,8 @@ import { ParticipantsPanel } from './ParticipantsPanel';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Video } from 'lucide-react';
+import { GoLiveDialog } from './GoLiveDialog';
+import { SettingsDialog } from './SettingsDialog';
 
 export function StudioLayout() {
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -21,8 +23,27 @@ export function StudioLayout() {
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const { toast } = useToast();
+  
+  const [isGoLiveDialogOpen, setGoLiveDialogOpen] = useState(false);
+  const [rtmpDestinations, setRtmpDestinations] = useState<RtmpDestination[]>([]);
+  const [activeDestinations, setActiveDestinations] = useState<string[]>([]);
+
 
   const host: Participant | undefined = useMemo(() => participants.find(p => p.isHost), [participants]);
+
+  // Load RTMP destinations from local storage
+  useEffect(() => {
+    try {
+      const item = window.localStorage.getItem('rtmp-destinations');
+      const parsedItem = item ? JSON.parse(item) : [];
+      if (Array.isArray(parsedItem)) {
+          setRtmpDestinations(parsedItem);
+      }
+    } catch (error) {
+      console.warn('Error reading localStorage "rtmp-destinations":', error);
+      setRtmpDestinations([]);
+    }
+  }, []);
 
   // Request camera and mic permissions
   useEffect(() => {
@@ -146,8 +167,33 @@ export function StudioLayout() {
   };
 
   const handleGoLive = () => {
-    setIsLive(!isLive);
+    if (isLive) {
+      // Stop streaming
+      setIsLive(false);
+      setActiveDestinations([]);
+      toast({
+        title: "Stream Ended",
+        description: "You have stopped broadcasting.",
+      });
+    } else {
+      // Open dialog to start streaming
+      setGoLiveDialogOpen(true);
+    }
   };
+  
+  const handleStartStreaming = (selectedIds: string[]) => {
+    setActiveDestinations(selectedIds);
+    setIsLive(true);
+    setGoLiveDialogOpen(false);
+    toast({
+        title: "You are live!",
+        description: `Successfully started streaming to ${selectedIds.length} destination(s).`,
+      });
+  }
+
+  const handleDestinationsChange = (newDestinations: RtmpDestination[]) => {
+    setRtmpDestinations(newDestinations);
+  }
 
   if (hasCameraPermission === false) {
     return (
@@ -174,7 +220,12 @@ export function StudioLayout() {
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-background text-foreground font-sans">
       <main className="flex-1 flex flex-col">
-        <Header />
+        <Header>
+            <SettingsDialog 
+                savedDestinations={rtmpDestinations}
+                onDestinationsChange={handleDestinationsChange}
+            />
+        </Header>
         <Scene
           participants={onStageParticipants}
           focusedParticipantId={focusedParticipantId}
@@ -202,6 +253,12 @@ export function StudioLayout() {
         toggleMute={toggleMute}
         toggleCamera={toggleCamera}
         setFocus={setFocus}
+      />
+       <GoLiveDialog 
+        open={isGoLiveDialogOpen}
+        onOpenChange={setGoLiveDialogOpen}
+        destinations={rtmpDestinations}
+        onStartStreaming={handleStartStreaming}
       />
     </div>
   );
