@@ -22,7 +22,7 @@ export function ParticipantCard({
   layout
 }: ParticipantCardProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null); // Ref for the content container
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
@@ -40,9 +40,9 @@ export function ParticipantCard({
   }, []);
 
   const toggleFullscreen = () => {
-    if (!cardRef.current) return;
+    if (!contentRef.current) return;
     if (!document.fullscreenElement) {
-      cardRef.current.requestFullscreen().catch(err => {
+      contentRef.current.requestFullscreen().catch(err => {
         alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
       });
     } else {
@@ -54,11 +54,13 @@ export function ParticipantCard({
   const isCircle = layout === 'circle' && !isFocused && !participant.isScreenSharing;
 
   return (
-    <div ref={cardRef} className="relative w-full h-full flex flex-col items-center gap-2 group">
+    <div className="relative w-full h-full flex flex-col items-center gap-2 group">
         <div
+        ref={contentRef}
         className={cn(
             "w-full h-full bg-card/50 border-0 overflow-hidden relative transition-all duration-300",
             isCircle ? "rounded-full aspect-square" : "rounded-lg",
+            "flex items-center justify-center", // Center content
             isFullscreen && "rounded-none"
         )}
         >
@@ -88,45 +90,50 @@ export function ParticipantCard({
             </>
         )}
             
-        {!showVideo && !isCircle && <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />}
+        {!showVideo && !isCircle && !isFullscreen && <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />}
         
-        <div className="absolute top-2 left-2 flex items-center gap-2">
-            {participant.isMuted && (
-            <div className="p-1.5 bg-background/70 rounded-md backdrop-blur-sm">
-                <MicOff className="size-4 text-destructive" />
-            </div>
-            )}
-            {!participant.isCameraOn && !participant.isScreenSharing && (
-            <div className="p-1.5 bg-background/70 rounded-md backdrop-blur-sm">
-                <VideoOff className="size-4 text-destructive" />
-            </div>
-            )}
-        </div>
-        
-        <div className={cn(
-            "absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity",
-            isFullscreen && "opacity-100"
-            )}>
-            {!isCircle && (
-                <Button variant="ghost" size="icon" onClick={onFocus} className="text-white hover:bg-white/20 hover:text-white h-9 w-9">
-                {isFocused ? (
-                    <Shrink className="size-5" />
-                ) : (
-                    <Maximize className="size-5" />
+        {!isFullscreen && (
+          <>
+            <div className="absolute top-2 left-2 flex items-center gap-2">
+                {participant.isMuted && (
+                <div className="p-1.5 bg-background/70 rounded-md backdrop-blur-sm">
+                    <MicOff className="size-4 text-destructive" />
+                </div>
                 )}
-                <span className="sr-only">{isFocused ? 'Shrink' : 'Focus'}</span>
+                {!participant.isCameraOn && !participant.isScreenSharing && (
+                <div className="p-1.5 bg-background/70 rounded-md backdrop-blur-sm">
+                    <VideoOff className="size-4 text-destructive" />
+                </div>
+                )}
+            </div>
+            
+            <div className={cn(
+                "absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                )}>
+                {!isCircle && (
+                    <Button variant="ghost" size="icon" onClick={onFocus} className="text-white hover:bg-white/20 hover:text-white h-9 w-9">
+                    {isFocused ? (
+                        <Shrink className="size-5" />
+                    ) : (
+                        <Maximize className="size-5" />
+                    )}
+                    <span className="sr-only">{isFocused ? 'Shrink' : 'Focus'}</span>
+                    </Button>
+                )}
+                <Button variant="ghost" size="icon" onClick={toggleFullscreen} className="text-white hover:bg-white/20 hover:text-white h-9 w-9">
+                    {isFullscreen ? <Minimize2 className="size-5" /> : <Maximize2 className="size-5" />}
+                    <span className="sr-only">{isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}</span>
                 </Button>
-            )}
-            <Button variant="ghost" size="icon" onClick={toggleFullscreen} className="text-white hover:bg-white/20 hover:text-white h-9 w-9">
-                {isFullscreen ? <Minimize2 className="size-5" /> : <Maximize2 className="size-5" />}
-                <span className="sr-only">{isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}</span>
-            </Button>
+            </div>
+          </>
+        )}
         </div>
-        </div>
-        <div className="flex items-center gap-2 text-sm font-medium text-foreground drop-shadow-md max-w-full truncate">
-            {participant.isScreenSharing && <Monitor className="size-4 text-accent" />}
-            {participant.name}
-        </div>
+        {!isFullscreen && (
+          <div className="flex items-center gap-2 text-sm font-medium text-foreground drop-shadow-md max-w-full truncate">
+              {participant.isScreenSharing && <Monitor className="size-4 text-accent" />}
+              {participant.name}
+          </div>
+        )}
     </div>
   );
 }
