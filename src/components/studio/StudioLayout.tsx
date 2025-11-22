@@ -220,30 +220,56 @@ export function StudioLayout() {
     }
   };
 
-  const handleGoLive = () => {
+  const handleGoLive = async () => {
     if (isLive) {
       // Stop streaming
-      setIsLive(false);
-      setActiveDestinations([]);
-      toast({
-        title: "Stream Ended",
-        description: "You have stopped broadcasting.",
-      });
+      try {
+        await fetch('http://localhost:3001/api/broadcast/stop', { method: 'POST' });
+        setIsLive(false);
+        setActiveDestinations([]);
+        toast({
+          title: "Stream Ended",
+          description: "You have stopped broadcasting.",
+        });
+      } catch (error) {
+        console.error("Failed to stop broadcast:", error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Could not stop the broadcast. Please check the server.',
+        });
+      }
     } else {
       // Open dialog to start streaming
       setGoLiveDialogOpen(true);
     }
   };
   
-  const handleStartStreaming = (selectedIds: string[]) => {
+  const handleStartStreaming = async (selectedIds: string[]) => {
     const selectedDestinations = rtmpDestinations.filter(d => selectedIds.includes(d.id));
-    setActiveDestinations(selectedDestinations);
-    setIsLive(true);
-    setGoLiveDialogOpen(false);
-    toast({
-        title: "You are live!",
-        description: `Successfully started streaming to ${selectedIds.length} destination(s).`,
-      });
+    try {
+        await fetch('http://localhost:3001/api/broadcast/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ destinations: selectedDestinations }),
+        });
+
+        setActiveDestinations(selectedDestinations);
+        setIsLive(true);
+        setGoLiveDialogOpen(false);
+        toast({
+            title: "You are live!",
+            description: `Successfully started streaming to ${selectedIds.length} destination(s).`,
+        });
+
+    } catch (error) {
+        console.error("Failed to start broadcast:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Broadcast Error',
+            description: 'Could not start the stream. Check the local server connection.',
+        });
+    }
   }
 
   const handleDestinationsChange = (newDestinations: RtmpDestination[]) => {

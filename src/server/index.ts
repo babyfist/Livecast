@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import type { ChatMessage, ChatPlatform } from '../lib/types';
+import type { ChatMessage, ChatPlatform, RtmpDestination } from '../lib/types';
 
 const app = express();
 const port = 3001;
@@ -68,6 +68,26 @@ app.get('/api/chat', (req, res) => {
   // messages for specific channels from their respective APIs.
   // For now, we just return all simulated messages.
   res.json(serverSimulatedMessages);
+});
+
+// Endpoint to start a "broadcast"
+app.post('/api/broadcast/start', (req, res) => {
+    const { destinations } = req.body as { destinations: RtmpDestination[] };
+    if (!destinations || destinations.length === 0) {
+        return res.status(400).json({ message: 'No destinations provided.' });
+    }
+    const destinationNames = destinations.map(d => d.name).join(', ');
+    console.log(`🎬 Received request to start broadcast to: ${destinationNames}`);
+    // In a real app, this is where you would initiate the RTMP stream(s)
+    // using a tool like FFMPEG.
+    res.status(200).json({ message: `Simulating broadcast start to ${destinationNames}` });
+});
+
+// Endpoint to stop a "broadcast"
+app.post('/api/broadcast/stop', (req, res) => {
+    console.log(`🛑 Received request to stop broadcast.`);
+    // In a real app, this is where you would terminate the RTMP stream(s).
+    res.status(200).json({ message: 'Simulating broadcast stop.' });
 });
 
 
