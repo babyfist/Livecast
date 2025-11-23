@@ -224,7 +224,7 @@ export function StudioLayout() {
     if (isLive) {
       // Stop streaming
       try {
-        await fetch('http://localhost:3001/api/broadcast/stop', { method: 'POST' });
+        await fetch('/api/broadcast/stop', { method: 'POST' });
         setIsLive(false);
         setActiveDestinations([]);
         toast({
@@ -248,7 +248,7 @@ export function StudioLayout() {
   const handleStartStreaming = async (selectedIds: string[]) => {
     const selectedDestinations = rtmpDestinations.filter(d => selectedIds.includes(d.id));
     try {
-        await fetch('http://localhost:3001/api/broadcast/start', {
+        await fetch('/api/broadcast/start', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ destinations: selectedDestinations }),
