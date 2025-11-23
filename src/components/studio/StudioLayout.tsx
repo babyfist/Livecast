@@ -267,7 +267,7 @@ export function StudioLayout() {
             description: `Successfully started streaming to ${selectedIds.length} destination(s).`,
         });
 
-    } catch (error: any) => {
+    } catch (error: any) {
         console.error("Failed to start broadcast:", error);
         toast({
             variant: 'destructive',
