@@ -1,3 +1,4 @@
+'use client';
 import express from 'express';
 import cors from 'cors';
 import type { ChatMessage, ChatPlatform, RtmpDestination } from '../lib/types';
@@ -5,8 +6,8 @@ import type { ChatMessage, ChatPlatform, RtmpDestination } from '../lib/types';
 const app = express();
 const port = 3001;
 
-// Use cors middleware to allow requests from the Next.js app
-app.use(cors({ origin: 'http://localhost:9002' }));
+// Use cors middleware to allow requests from any origin during local development
+app.use(cors());
 app.use(express.json());
 
 // --- In-memory simulated chat store ---
