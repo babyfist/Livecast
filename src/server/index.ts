@@ -1,4 +1,3 @@
-'use client';
 import express from 'express';
 import cors from 'cors';
 import type { ChatMessage, ChatPlatform, RtmpDestination } from '../lib/types';
