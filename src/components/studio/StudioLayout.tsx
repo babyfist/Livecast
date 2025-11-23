@@ -224,7 +224,7 @@ export function StudioLayout() {
     if (isLive) {
       // Stop streaming
       try {
-        await fetch('/api/broadcast/stop', { method: 'POST' });
+        await fetch('http://localhost:3001/api/broadcast/stop', { method: 'POST' });
         setIsLive(false);
         setActiveDestinations([]);
         toast({
@@ -248,11 +248,16 @@ export function StudioLayout() {
   const handleStartStreaming = async (selectedIds: string[]) => {
     const selectedDestinations = rtmpDestinations.filter(d => selectedIds.includes(d.id));
     try {
-        await fetch('/api/broadcast/start', {
+        const response = await fetch('http://localhost:3001/api/broadcast/start', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ destinations: selectedDestinations }),
         });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to start broadcast on server.');
+        }
 
         setActiveDestinations(selectedDestinations);
         setIsLive(true);
@@ -262,12 +267,12 @@ export function StudioLayout() {
             description: `Successfully started streaming to ${selectedIds.length} destination(s).`,
         });
 
-    } catch (error) {
+    } catch (error: any) => {
         console.error("Failed to start broadcast:", error);
         toast({
             variant: 'destructive',
             title: 'Broadcast Error',
-            description: 'Could not start the stream. Check the local server connection.',
+            description: error.message || 'Could not start the stream. Check the local server connection and ensure FFmpeg is installed.',
         });
     }
   }
